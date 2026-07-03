@@ -1,0 +1,6 @@
+{
+  "appId": "com.smartiptv.app",
+  "appName": "SmartIPTV",
+  "webDir": "pwa",
+  "bundledWebRuntime": false
+}

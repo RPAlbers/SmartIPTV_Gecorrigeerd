@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "Resources/server/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "pwa/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/parse",
+      "dest": "Resources/server/index.js"
+    },
+    {
+      "src": "/xtream",
+      "dest": "Resources/server/index.js"
+    },
+    {
+      "src": "/stalker",
+      "dest": "Resources/server/index.js"
+    },
+    {
+      "src": "/parse-xml",
+      "dest": "Resources/server/index.js"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "pwa/assets/$1"
+    },
+    {
+      "src": "/(manifest.webmanifest|ngsw-worker.js|ngsw.json|safety-worker.js|worker-basic.min.js|3rdpartylicenses.txt|polyfills.js|main.js|styles.css)",
+      "dest": "pwa/$1"
+    },
+    {
+      "src": "/(chunk-.*.js)",
+      "dest": "pwa/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "pwa/index.html"
+    }
+  ]
+}

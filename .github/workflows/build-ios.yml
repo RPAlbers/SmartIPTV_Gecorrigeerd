@@ -1,0 +1,50 @@
+name: Build iOS App (Unsigned IPA)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-13
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: |
+          npm install
+
+      - name: Add iOS Platform and Sync
+        run: |
+          npx cap ios add || true
+          npx cap sync ios
+
+      - name: Build Xcode Project (Unsigned)
+        run: |
+          xcodebuild -workspace ios/App/App.xcworkspace \
+                     -scheme App \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     -derivedDataPath build \
+                     CODE_SIGNING_ALLOWED=NO \
+                     CODE_SIGNING_REQUIRED=NO \
+                     clean build
+
+      - name: Create IPA Package
+        run: |
+          mkdir -p build/Payload
+          cp -r build/Build/Products/Release-iphoneos/App.app build/Payload/
+          cd build
+          zip -r SmartIPTV.ipa Payload
+          cd ..
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: SmartIPTV-Unsigned-IPA
+          path: build/SmartIPTV.ipa

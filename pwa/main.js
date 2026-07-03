@@ -7296,7 +7296,13 @@ var AppConfig = {
   version: require_package().version,
   // BACKEND_URL: 'https://iptvnator-playlist-parser-api.vercel.app',
   // BACKEND_URL: 'https://corsproxy.io/?',
-  BACKEND_URL: "http://localhost:4201"
+  BACKEND_URL: (function() {
+    var origin = window.location.origin;
+    if (origin.startsWith("capacitor://") || (origin.startsWith("http://localhost") && !origin.includes(":4201"))) {
+      return "http://localhost:4201";
+    }
+    return origin;
+  })()
 };
 
 // node_modules/zone.js/fesm2015/zone.js

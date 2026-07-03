@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const path = require("path");
 const parser = require("iptv-playlist-parser");
 const epgParser = require("epg-parser");
 const axios = require("axios");
@@ -25,9 +26,8 @@ const https = require("https");
 const agent = new https.Agent({
   rejectUnauthorized: false,
 });
-
-app.get("/", (req, res) => res.send("Hello world"));
-
+// Serve static files from the pwa folder
+app.use(express.static(path.join(__dirname, "../../pwa")));
 app.get("/parse", cors(corsOptions), async (req, res) => {
   const { url } = req.query;
   if (isDev) console.log(url);
@@ -216,6 +216,10 @@ const createPlaylistObject = (name, playlist, url) => {
     url,
   };
 };
+// Catch-all route to serve the Angular application for client-side routing
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../pwa/index.html"));
+});
 
 const port = process.env.PORT || 4201;
 app.listen(port, () =>
