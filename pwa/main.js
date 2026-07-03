@@ -10259,6 +10259,26 @@ var PwaService = class _PwaService extends DataService {
         Cookie: `mac=${payload.macAddress}`
       }
     } : {};
+    const isCapacitor = window.location.origin.startsWith("capacitor://") || (window.location.origin.startsWith("http://localhost") && !window.location.origin.includes(":4201"));
+    if (isCapacitor) {
+      const xtreamApiPath = "/player_api.php";
+      return this.http.get(payload.url + xtreamApiPath, __spreadValues({
+        params: payload.params
+      }, headers)).pipe(catchError((response) => {
+        window.postMessage({
+          type: ERROR,
+          status: response.status,
+          message: response.message ?? "Unknown error"
+        });
+        return EMPTY;
+      })).subscribe((response) => {
+        window.postMessage({
+          type: XTREAM_RESPONSE,
+          payload: response,
+          action: payload.params.action
+        });
+      });
+    }
     return this.http.get(`${this.corsProxyUrl}/xtream`, __spreadValues({
       params: __spreadValues({
         url: payload.url
@@ -10287,6 +10307,29 @@ var PwaService = class _PwaService extends DataService {
     });
   }
   forwardStalkerRequest(payload) {
+    const isCapacitor = window.location.origin.startsWith("capacitor://") || (window.location.origin.startsWith("http://localhost") && !window.location.origin.includes(":4201"));
+    if (isCapacitor) {
+      return this.http.get(payload.url, {
+        params: payload.params,
+        headers: {
+          Cookie: `mac=${payload.macAddress}`,
+          ...(payload.token ? { Authorization: `Bearer ${payload.token}` } : {})
+        }
+      }).pipe(catchError((response) => {
+        window.postMessage({
+          type: ERROR,
+          status: response.status,
+          message: response.message ?? "Unknown error"
+        });
+        return EMPTY;
+      })).subscribe((response) => {
+        window.postMessage({
+          type: STALKER_RESPONSE,
+          payload: response,
+          action: payload.params.action
+        });
+      });
+    }
     return this.http.get(`${this.corsProxyUrl}/stalker`, {
       params: __spreadProps(__spreadValues({
         url: payload.url

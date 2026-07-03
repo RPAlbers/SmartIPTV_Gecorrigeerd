@@ -24,6 +24,10 @@ jobs:
           npx cap ios add || true
           npx cap sync ios
 
+      - name: Configure App Transport Security (Allow HTTP Streams)
+        run: |
+          plutil -insert NSAppTransportSecurity -xml "<dict><key>NSAllowsArbitraryLoads</key><true/></dict>" ios/App/App/Info.plist || true
+
       - name: Build Xcode Project (Unsigned)
         run: |
           xcodebuild -workspace ios/App/App.xcworkspace \
